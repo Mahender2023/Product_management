@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <!-- 1. Why? We define a property for the log file path. This makes it easy to change later. -->
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        <Property name="LOG_FILE_PATH">C:/Users/mahen/Downloads/product-management/product-management/logs</Property> <!-- Absolute path for logs directory -->
+    </Properties>
+
+    <Appenders>
+        <!-- 2. Why Console Appender? To see logs in the console during development. -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <!-- 3. Why RollingFile Appender? This is our main file logger.
+             It creates a new log file when the current one reaches a certain size (e.g., 10MB).
+             It also keeps an archive of old files (up to 10), preventing a single log file from getting huge. -->
+        <RollingFile name="FileAppender" fileName="${LOG_FILE_PATH}/product-management.log"
+                     filePattern="${LOG_FILE_PATH}/product-management-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- 4. Why Root Logger? This is the default logger for the entire application.
+             We set its level to 'info', meaning it will log INFO, WARN, ERROR, and FATAL messages.
+             It will send logs to both the Console and our FileAppender. -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileAppender"/>
+        </Root>
+
+        <!-- 5. Why this logger? We can set different log levels for specific packages.
+             For example, setting 'com.project.product_management' to 'debug' will show more detailed
+             logs from our own code without cluttering the output with debug logs from Spring itself. -->
+        <Logger name="com.project.product_management" level="debug" additivity="false">
+             <AppenderRef ref="Console"/>
+             <AppenderRef ref="FileAppender"/>
+        </Logger>
+    </Loggers>
+    <!-- NOTE: Ensure the 'logs' directory exists at runtime. Log4j2 does not create directories automatically. -->
+</Configuration>
